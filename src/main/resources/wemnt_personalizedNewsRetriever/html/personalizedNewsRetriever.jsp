@@ -25,6 +25,7 @@
     <c:set var="maxNews" value="${currentNode.properties['maxNews'].long}"/>
     <c:set var="newsDateLastDays" value="${currentNode.properties['newsDateLastDays'].long}"/>
     <c:set var="lastNewsIds" value="${wem:retrieveLastContents(renderContext, renderContext.site.siteKey, newsDateLastDays, 'jnt:news', 'date')}"/>
+    <c:set var="tags" value="${wem:getTagsAggregation(renderContext.request, renderContext.site.siteKey, 30)}"/>
 
     <h2>${currentNode.properties['jcr:title'].string}</h2>
 
@@ -32,6 +33,18 @@
         <c:when test="${functions:length(lastNewsIds) != 0}">
             <c:forEach items="${lastNewsIds}" var="lastNewsId" end="${maxNews - 1}">
                 <jcr:node var="lastNewsNode" uuid="${lastNewsId}"/>
+
+                <c:if test="${functions:length(tags) != 0}">
+                    <span><fmt:message key="personalizedNewsRetriever.becauseYouLike.label"/></span>
+
+                    <c:forEach var="entry" items="${tags}" varStatus="status">
+                        <span>${entry.key} (${entry.value})</span>
+
+                        <c:if test="${!status.last}">&#44;</c:if>
+                        <c:if test="${status.last}">&#58;</c:if>
+                    </c:forEach>
+                </c:if>
+
                 <template:module node="${lastNewsNode}"/>
             </c:forEach>
         </c:when>
