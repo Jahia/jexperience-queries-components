@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.jahia.modules</groupId>
             <artifactId>marketing-factory-core</artifactId>
-            <version>1.9.1-SNAPSHOT</version>
+            <version>1.9.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -12,3 +12,4 @@
  - jcr:title (string) internationalized
  - maxNews (long) = 10 indexed=no
  - newsDateLastDays (long) = 30 indexed=no
+ - hideViewedNews (boolean) = false autocreated
