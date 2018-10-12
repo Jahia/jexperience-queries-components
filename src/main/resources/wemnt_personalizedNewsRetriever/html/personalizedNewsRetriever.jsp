@@ -25,8 +25,9 @@
     <c:set var="maxNews" value="${currentNode.properties['maxNews'].long}"/>
     <c:set var="newsDateLastDays" value="${currentNode.properties['newsDateLastDays'].long}"/>
     <c:set var="hideViewedNews" value="${currentNode.properties['hideViewedNews'].boolean}"/>
-    <c:set var="lastNewsIds" value="${wem:retrieveLastContents(renderContext, renderContext.site.siteKey, newsDateLastDays, 'jnt:news', 'date', hideViewedNews)}"/>
-    <c:set var="tags" value="${wem:getTagsAggregation(renderContext.request, renderContext.site.siteKey, 30)}"/>
+    <c:set var="result" value="${wem:retrieveLastContents(renderContext, renderContext.site.siteKey, newsDateLastDays, 'jnt:news', 'date', hideViewedNews)}"/>
+    <c:set var="lastNewsIds" value="${result.contents}"/>
+    <c:set var="tags" value="${result.tags}"/>
 
     <h2>${currentNode.properties['jcr:title'].string}</h2>
 
