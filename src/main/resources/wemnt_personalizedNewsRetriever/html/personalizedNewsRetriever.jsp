@@ -34,16 +34,27 @@
     <c:choose>
         <c:when test="${functions:length(lastNewsIds) != 0}">
             <c:forEach items="${lastNewsIds}" var="lastNewsId" end="${maxNews - 1}">
+                <c:set var="isFirstTime" value="true"/>
                 <jcr:node var="lastNewsNode" uuid="${lastNewsId}"/>
 
                 <c:if test="${functions:length(tags) != 0}">
-                    <span><fmt:message key="personalizedNewsRetriever.becauseYouLike.label"/></span>
+                    <c:forEach var="tag" items="${tags}">
+                        <c:if test="${tag.key == lastNewsId}">
+                            <c:if test="${isFirstTime}">
+                                <span><fmt:message key="personalizedNewsRetriever.becauseYouLike.label"/></span>
+                                <c:set var="isFirstTime" value="false"/>
+                            </c:if>
 
-                    <c:forEach var="entry" items="${tags}" varStatus="status">
-                        <span>${entry.key} (${entry.value})</span>
+                            <c:forEach var="entry" items="${tag.value}" varStatus="status">
+                                <span>${entry}</span>
 
-                        <c:if test="${!status.last}">&#44;</c:if>
-                        <c:if test="${status.last}">&#58;</c:if>
+                                <c:if test="${!status.last}">
+                                    <span>&#44;</span>
+                                </c:if>
+                            </c:forEach>
+
+                            <span>&#58;</span>
+                        </c:if>
                     </c:forEach>
                 </c:if>
 
