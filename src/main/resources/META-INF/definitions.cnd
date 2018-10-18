@@ -9,7 +9,7 @@
 [wemmix:wemPNComponents] > jmix:droppableContent mixin
 
 [wemnt:personalizedNewsRetriever] > jnt:content, wemmix:wemPNComponents, mix:title, jmix:list
- - jcr:title (string) internationalized
+ - jcr:title (string) mandatory internationalized
  - maxNews (long) = 10 indexed=no
  - newsDateLastDays (long) = 30 indexed=no
  - hideViewedNews (boolean) = false autocreated
