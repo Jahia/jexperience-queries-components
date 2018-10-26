@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://java.sun.com/xml/ns/j2ee"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+        version="2.0">
+
+    <description>Pnr module tag library</description>
+    <display-name>Pnr Service</display-name>
+    <tlib-version>7.1</tlib-version>
+    <short-name>pnr</short-name>
+    <uri>http://www.jahia.org/tags/pnr</uri>
+
+    <function>
+        <description>Retrieve last contents</description>
+        <name>retrieveLastContents</name>
+        <function-class>org.jahia.modules.personalizednewsretriever.tag.PnrFunctions</function-class>
+        <function-signature>java.util.Map retrieveLastContents(org.jahia.services.render.RenderContext,java.lang.String,long,java.lang.String,java.lang.String,boolean)</function-signature>
+    </function>
+</taglib>
