@@ -40,7 +40,7 @@
     </parent>
 
     <artifactId>mf-personalized-news-retriever</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>Personalized News Retriever Component</name>
     <description>This is the custom module (Personalized News Retriever component) for running on a Digital Experience Manager server.</description>
