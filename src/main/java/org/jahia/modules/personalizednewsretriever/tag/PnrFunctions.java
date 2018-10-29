@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.personalizednewsretriever.tag;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.marketingfactory.admin.ContextServerService;
 import org.jahia.modules.marketingfactory.tag.WemFunctions;
@@ -50,6 +51,7 @@ public class PnrFunctions {
 
     private static ContextServerService contextServerService;
     private static JCRTemplate jcrTemplate;
+    private static String ipForwardingHeaderName;
 
     public static Map<String, Object> retrieveLastContents(RenderContext renderContext, String siteKey, long numberOfPastDays, String nodeType, String datePropertyName, boolean hideViewedContents) throws RepositoryException, IOException, JSONException {
         Set<String> viewedContents = new HashSet<>();
@@ -164,7 +166,7 @@ public class PnrFunctions {
 
         Map<String, Long> result = jcrTemplate.doExecuteWithSystemSessionAsUser(null, Constants.EDIT_WORKSPACE, null, jcrTemplateSession -> {
             try {
-                return contextServerService.executePostRequest(jcrTemplateSession.getUserNode(), siteKey, url, aggregateQuery.toString(), null);
+                return contextServerService.executePostRequest(jcrTemplateSession.getUserNode(), siteKey, url, aggregateQuery.toString(), null, getHeaders(httpServletRequest) ,null);
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("Unable to execute post request", e);
@@ -254,11 +256,26 @@ public class PnrFunctions {
         return lastContents;
     }
 
+    private static Map<String, String> getHeaders(HttpServletRequest httpServletRequest) {
+        Map<String, String> headers = new HashMap<>();
+        String xff = httpServletRequest.getHeader(ipForwardingHeaderName);
+        if (StringUtils.isNotBlank(xff)) {
+            headers.put("X-Forwarded-For", xff);
+            logger.debug("X-Forwarded-For header value set to " + xff);
+        }
+        headers.put("User-Agent", httpServletRequest.getHeader("User-Agent"));
+        return headers;
+    }
+
     public void setContextServerService(ContextServerService contextServerService) {
         PnrFunctions.contextServerService = contextServerService;
     }
 
     public void setJcrTemplate(JCRTemplate jcrTemplate) {
         PnrFunctions.jcrTemplate = jcrTemplate;
+    }
+
+    public void setIpForwardingHeaderName(String ipForwardingHeaderName) {
+        PnrFunctions.ipForwardingHeaderName = ipForwardingHeaderName;
     }
 }
