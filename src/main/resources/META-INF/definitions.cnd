@@ -2,13 +2,13 @@
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
 <jnt = 'http://www.jahia.org/jahia/nt/1.0'>
 <mix = 'http://www.jcp.org/jcr/mix/1.0'>
-<wemmix = 'http://www.jahia.org/jahia/wem/mix/1.0'>
-<wemnt = 'http://www.jahia.org/jahia/wem/nt/1.0'>
-<wem = 'http://www.jahia.org/jahia/wem/1.0'>
+<pnrmix = 'http://www.jahia.org/jahia/pnr/mix/1.0'>
+<pnrnt = 'http://www.jahia.org/jahia/pnr/nt/1.0'>
+<pnr = 'http://www.jahia.org/jahia/pnr/1.0'>
 
-[wemmix:wemPNComponents] > jmix:droppableContent mixin
+[pnrmix:wemPNComponents] > jmix:droppableContent mixin
 
-[wemnt:personalizedNewsRetriever] > jnt:content, wemmix:wemPNComponents, mix:title, jmix:list
+[pnrnt:personalizedNewsRetriever] > jnt:content, pnrmix:wemPNComponents, mix:title, jmix:list
  - jcr:title (string) mandatory internationalized
  - maxNews (long) = 10 indexed=no
  - newsDateLastDays (long) = 30 indexed=no
