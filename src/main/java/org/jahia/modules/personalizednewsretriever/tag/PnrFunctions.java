@@ -29,7 +29,6 @@ import org.jahia.modules.marketingfactory.admin.ContextServerService;
 import org.jahia.modules.marketingfactory.tag.WemFunctions;
 import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.*;
-import org.jahia.services.content.decorator.JCRUserNode;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.search.Hit;
 import org.jahia.services.search.JCRNodeHit;
@@ -51,7 +50,6 @@ public class PnrFunctions {
     private static Logger logger = LoggerFactory.getLogger(PnrFunctions.class);
 
     private static ContextServerService contextServerService;
-    private static JCRTemplate jcrTemplate;
     private static String ipForwardingHeaderName;
 
     public static Map<String, Object> retrieveLastContents(RenderContext renderContext, String siteKey, long numberOfPastDays, String nodeType, String datePropertyName, boolean hideViewedContents) throws RepositoryException, IOException, JSONException {
@@ -110,7 +108,7 @@ public class PnrFunctions {
         return result;
     }
 
-    private static Set<String> getViewedContents(HttpServletRequest httpServletRequest, String siteKey, long numberOfPastDays, String nodeType) throws JSONException, RepositoryException {
+    private static Set<String> getViewedContents(HttpServletRequest httpServletRequest, String siteKey, long numberOfPastDays, String nodeType) throws JSONException, IOException {
         String url = "/cxs/query/event/target.itemId?optimizedQuery=true";
         String profileId = contextServerService.getProfileId(httpServletRequest, siteKey);
 
@@ -165,18 +163,7 @@ public class PnrFunctions {
         JSONObject aggregateQuery = new JSONObject();
         aggregateQuery.put("condition", booleanCondition);
 
-        Map<String, Long> result = jcrTemplate.doExecuteWithSystemSessionAsUser(null, Constants.EDIT_WORKSPACE, null, jcrTemplateSession -> {
-            try {
-                JCRUserNode userNode = new JCRUserNode(jcrTemplateSession.getRootNode());
-
-                return contextServerService.executePostRequest(userNode, siteKey, url, aggregateQuery.toString(), null, getHeaders(httpServletRequest) ,new HashMap<>().getClass());
-            } catch (IOException e) {
-                e.printStackTrace();
-                logger.error("Unable to execute post request", e);
-            }
-
-            return null;
-        });
+        Map<String, Long> result = contextServerService.executePostRequest(siteKey, url, aggregateQuery.toString(), null, getHeaders(httpServletRequest), new HashMap<>().getClass());
 
         result.remove("_filtered");
         result.remove("_missing");
@@ -272,10 +259,6 @@ public class PnrFunctions {
 
     public void setContextServerService(ContextServerService contextServerService) {
         PnrFunctions.contextServerService = contextServerService;
-    }
-
-    public void setJcrTemplate(JCRTemplate jcrTemplate) {
-        PnrFunctions.jcrTemplate = jcrTemplate;
     }
 
     public void setIpForwardingHeaderName(String ipForwardingHeaderName) {

@@ -9,7 +9,6 @@
 
     <bean id="getPublicationDataForNode" class="org.jahia.modules.personalizednewsretriever.tag.PnrFunctions">
         <property name="contextServerService" ref="contextServerService"/>
-        <property name="jcrTemplate" ref="jcrTemplate"/>
         <property name="ipForwardingHeaderName" value="${pnrIpForwardingHeaderName:X-Forwarded-For}"/>
     </bean>
 </beans>
