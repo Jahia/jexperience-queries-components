@@ -29,6 +29,7 @@ import org.jahia.modules.marketingfactory.admin.ContextServerService;
 import org.jahia.modules.marketingfactory.tag.WemFunctions;
 import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.*;
+import org.jahia.services.content.decorator.JCRUserNode;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.search.Hit;
 import org.jahia.services.search.JCRNodeHit;
@@ -166,7 +167,9 @@ public class PnrFunctions {
 
         Map<String, Long> result = jcrTemplate.doExecuteWithSystemSessionAsUser(null, Constants.EDIT_WORKSPACE, null, jcrTemplateSession -> {
             try {
-                return contextServerService.executePostRequest(jcrTemplateSession.getUserNode(), siteKey, url, aggregateQuery.toString(), null, getHeaders(httpServletRequest) ,null);
+                JCRUserNode userNode = new JCRUserNode(jcrTemplateSession.getRootNode());
+
+                return contextServerService.executePostRequest(userNode, siteKey, url, aggregateQuery.toString(), null, getHeaders(httpServletRequest) ,new HashMap<>().getClass());
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("Unable to execute post request", e);
