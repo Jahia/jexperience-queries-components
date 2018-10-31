@@ -24,7 +24,6 @@
 package org.jahia.modules.personalizednewsretriever.tag;
 
 import org.apache.commons.lang.StringUtils;
-import org.jahia.api.Constants;
 import org.jahia.modules.marketingfactory.admin.ContextServerService;
 import org.jahia.modules.marketingfactory.tag.WemFunctions;
 import org.jahia.registries.ServicesRegistry;
