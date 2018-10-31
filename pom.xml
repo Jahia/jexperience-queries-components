@@ -29,9 +29,7 @@
          If you are unsure which license is appropriate for your use,
         please contact the sales department at sales@jahia.com.
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jahia.modules</groupId>
@@ -40,7 +38,7 @@
     </parent>
 
     <artifactId>mf-personalized-news-retriever</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>bundle</packaging>
     <name>Personalized News Retriever Component</name>
     <description>This is the custom module (Personalized News Retriever component) for running on a Digital Experience Manager server.</description>
@@ -49,7 +47,7 @@
         <connection>scm:git:git@github.com:Jahia/mf-personalized-news-retriever.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/mf-personalized-news-retriever.git</developerConnection>
         <url>https://github.com/Jahia/mf-personalized-news-retriever</url>
-        <tag>HEAD</tag>
+        <tag>1_0_0</tag>
     </scm>
 
     <distributionManagement>
@@ -71,14 +69,14 @@
         <dependency>
             <groupId>org.jahia.modules</groupId>
             <artifactId>marketing-factory-core</artifactId>
-            <version>1.9.3-SNAPSHOT</version>
+            <version>1.9.3</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jahia.modules</groupId>
             <artifactId>search-provider-elasticsearch</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
+            <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -165,7 +163,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <instructions/>
+                    <instructions />
                 </configuration>
             </plugin>
         </plugins>
