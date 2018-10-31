@@ -75,8 +75,8 @@ public class PnrFunctions {
             for (String contentId : lastContents) {
                 JCRNodeWrapper content = renderContext.getSite().getSession().getNodeByUUID(contentId);
 
-                if (content.hasProperty(Constants.TAG_LIST)) {
-                    JCRValueWrapper[] tagList = content.getProperty(Constants.TAG_LIST).getValues();
+                if (content.hasProperty("j:tagList")) {
+                    JCRValueWrapper[] tagList = content.getProperty("j:tagList").getValues();
 
                     boolean tagExist = Arrays.stream(tagList).anyMatch(x -> {
                         try {
