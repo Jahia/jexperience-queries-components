@@ -54,11 +54,11 @@
 
     <distributionManagement>
         <repository>
-            <id>jahia-enterprise-releases</id>
+            <id>marketing-factory-releases</id>
             <url>https://devtools.jahia.com/nexus/content/repositories/marketing-factory-releases</url>
         </repository>
         <snapshotRepository>
-            <id>jahia-enterprise-snapshots</id>
+            <id>marketing-factory-snapshots</id>
             <url>https://devtools.jahia.com/nexus/content/repositories/marketing-factory-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
@@ -145,9 +145,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>apache-public</id>
-            <name>Apache Public Repository</name>
-            <url>https://repository.apache.org/content/groups/public</url>
+            <id>jahia-enterprise</id>
+            <name>Jahia Public Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/enterprise</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -157,21 +157,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jahia-public</id>
-            <name>Jahia Public Repository</name>
-            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>
