@@ -9,6 +9,6 @@
 
     <bean id="getPublicationDataForNode" class="org.jahia.modules.personalizedqueriescomponents.tag.PqcFunctions">
         <property name="contextServerService" ref="contextServerService"/>
-        <property name="ipForwardingHeaderName" value="${pqcIpForwardingHeaderName:X-Forwarded-For}"/>
+        <property name="ipForwardingHeaderName" value="${wemIpForwardingHeaderName:X-Forwarded-For}"/>
     </bean>
 </beans>
