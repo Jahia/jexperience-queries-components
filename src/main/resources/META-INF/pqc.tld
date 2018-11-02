@@ -5,16 +5,16 @@
         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
         version="2.0">
 
-    <description>Pnr module tag library</description>
-    <display-name>Pnr Service</display-name>
+    <description>Pqc module tag library</description>
+    <display-name>pqc Service</display-name>
     <tlib-version>7.1</tlib-version>
-    <short-name>pnr</short-name>
-    <uri>http://www.jahia.org/tags/pnr</uri>
+    <short-name>pqc</short-name>
+    <uri>http://www.jahia.org/tags/pqc</uri>
 
     <function>
         <description>Retrieve last contents</description>
         <name>retrieveLastContents</name>
-        <function-class>org.jahia.modules.personalizednewsretriever.tag.PnrFunctions</function-class>
+        <function-class>org.jahia.modules.personalizedqueriescomponents.tag.PqcFunctions</function-class>
         <function-signature>java.util.Map retrieveLastContents(org.jahia.services.render.RenderContext,java.lang.String,long,java.lang.String,java.lang.String,boolean)</function-signature>
     </function>
 </taglib>

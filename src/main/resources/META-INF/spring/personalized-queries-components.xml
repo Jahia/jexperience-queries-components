@@ -7,8 +7,8 @@
 
     <osgi:reference id="contextServerService" interface="org.jahia.modules.marketingfactory.admin.ContextServerService" availability="mandatory"/>
 
-    <bean id="getPublicationDataForNode" class="org.jahia.modules.personalizednewsretriever.tag.PnrFunctions">
+    <bean id="getPublicationDataForNode" class="org.jahia.modules.personalizedqueriescomponents.tag.PqcFunctions">
         <property name="contextServerService" ref="contextServerService"/>
-        <property name="ipForwardingHeaderName" value="${pnrIpForwardingHeaderName:X-Forwarded-For}"/>
+        <property name="ipForwardingHeaderName" value="${pqcIpForwardingHeaderName:X-Forwarded-For}"/>
     </bean>
 </beans>

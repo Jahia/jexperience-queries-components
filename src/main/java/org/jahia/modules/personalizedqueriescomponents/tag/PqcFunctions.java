@@ -21,7 +21,7 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.personalizednewsretriever.tag;
+package org.jahia.modules.personalizedqueriescomponents.tag;
 
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.marketingfactory.admin.ContextServerService;
@@ -45,8 +45,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class PnrFunctions {
-    private static Logger logger = LoggerFactory.getLogger(PnrFunctions.class);
+public class PqcFunctions {
+    private static Logger logger = LoggerFactory.getLogger(PqcFunctions.class);
 
     private static ContextServerService contextServerService;
     private static String ipForwardingHeaderName;
@@ -257,10 +257,10 @@ public class PnrFunctions {
     }
 
     public void setContextServerService(ContextServerService contextServerService) {
-        PnrFunctions.contextServerService = contextServerService;
+        PqcFunctions.contextServerService = contextServerService;
     }
 
     public void setIpForwardingHeaderName(String ipForwardingHeaderName) {
-        PnrFunctions.ipForwardingHeaderName = ipForwardingHeaderName;
+        PqcFunctions.ipForwardingHeaderName = ipForwardingHeaderName;
     }
 }

@@ -1,4 +1,4 @@
-package org.jahia.modules.marketingfactorycomponents.rules
+package org.jahia.modules.personalizedqueriescomponents.rules
 
 // list any import classes here.
 import org.jahia.services.content.rules.*

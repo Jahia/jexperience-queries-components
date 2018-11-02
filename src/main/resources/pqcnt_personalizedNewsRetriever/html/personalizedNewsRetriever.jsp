@@ -9,7 +9,7 @@
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="s" uri="http://www.jahia.org/tags/search" %>
-<%@ taglib prefix="pnr" uri="http://www.jahia.org/tags/pnr" %>
+<%@ taglib prefix="pqc" uri="http://www.jahia.org/tags/pqc" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -25,7 +25,7 @@
     <c:set var="maxNews" value="${currentNode.properties['maxNews'].long}"/>
     <c:set var="newsDateLastDays" value="${currentNode.properties['newsDateLastDays'].long}"/>
     <c:set var="hideViewedNews" value="${currentNode.properties['hideViewedNews'].boolean}"/>
-    <c:set var="result" value="${pnr:retrieveLastContents(renderContext, renderContext.site.siteKey, newsDateLastDays, 'jnt:news', 'date', hideViewedNews)}"/>
+    <c:set var="result" value="${pqc:retrieveLastContents(renderContext, renderContext.site.siteKey, newsDateLastDays, 'jnt:news', 'date', hideViewedNews)}"/>
     <c:set var="lastNewsIds" value="${result.contents}"/>
     <c:set var="tags" value="${result.tags}"/>
 
