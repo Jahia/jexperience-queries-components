@@ -1,11 +1,11 @@
-# Personalized News Retriever Component
+# Personalized queries components
 
-The component used to retrieve the latest news according to the profile criteria and the entered parameters.
+This project contains personalized queries components.
 
 ## Minimal requirements
 
-* DX 7.2.3.2-SNAPSHOT
-* Marketing Factory 1.9.1-SNAPSHOT
+* DX 7.2.2.0
+* Marketing Factory 1.9.3
 
 ## Build and deploy
 
@@ -18,7 +18,11 @@ mvn clean install jahia:deploy
 ## Installation
 Download the jar and deploy it on your instance then activate the module on the site you wish to use it.
 
-## How it works ?
+## Personalized News Retriever Component
+
+The component used to retrieve the latest news according to the profile criteria and the entered parameters.
+
+### How it works ?
 
 The criteria used to retrieve the list of news is:
 
