@@ -37,16 +37,16 @@
         <version>7.2.2.0</version>
     </parent>
 
-    <artifactId>mf-personalized-news-retriever</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <artifactId>personalized-queries-components</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>Personalized News Retriever Component</name>
-    <description>This is the custom module (Personalized News Retriever component) for running on a Digital Experience Manager server.</description>
+    <name>Personalized queries components</name>
+    <description>This is the custom module (Personalized queries components) for running on a Digital Experience Manager server.</description>
 
     <scm>
-        <connection>scm:git:git@github.com:Jahia/mf-personalized-news-retriever.git</connection>
-        <developerConnection>scm:git:git@github.com:Jahia/mf-personalized-news-retriever.git</developerConnection>
-        <url>https://github.com/Jahia/mf-personalized-news-retriever</url>
+        <connection>scm:git:git@github.com:Jahia/personalized-queries-components.git</connection>
+        <developerConnection>scm:git:git@github.com:Jahia/personalized-queries-components.git</developerConnection>
+        <url>https://github.com/Jahia/personalized-queries-components</url>
         <tag>HEAD</tag>
     </scm>
 
