@@ -38,7 +38,7 @@
     </parent>
 
     <artifactId>personalized-queries-components</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>Personalized queries components</name>
     <description>This is the custom module (Personalized queries components) for running on a Digital Experience Manager server.</description>
@@ -47,7 +47,7 @@
         <connection>scm:git:git@github.com:Jahia/personalized-queries-components.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/personalized-queries-components.git</developerConnection>
         <url>https://github.com/Jahia/personalized-queries-components</url>
-        <tag>1_0_0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
