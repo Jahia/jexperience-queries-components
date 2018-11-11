@@ -107,6 +107,124 @@ public class PqcFunctions {
         return result;
     }
 
+    public static Set<CustomObject> getViewedPage(RenderContext renderContext, String siteKey) throws JSONException, IOException, RepositoryException {
+        String url = "/cxs/query/event/target.itemId?optimizedQuery=true";
+
+        JSONObject nodeTypePropertyConditionParameters = new JSONObject();
+        nodeTypePropertyConditionParameters.put("propertyName", "eventType");
+        nodeTypePropertyConditionParameters.put("propertyValue", "view");
+        nodeTypePropertyConditionParameters.put("comparisonOperator", "equals");
+
+        JSONObject nodeTypePropertyCondition = new JSONObject();
+        nodeTypePropertyCondition.put("type", "eventPropertyCondition");
+        nodeTypePropertyCondition.put("parameterValues", nodeTypePropertyConditionParameters);
+
+        JSONObject itemTypePropertyConditionParameters = new JSONObject();
+        itemTypePropertyConditionParameters.put("propertyName", "target.itemType");
+        itemTypePropertyConditionParameters.put("propertyValue", "page");
+        itemTypePropertyConditionParameters.put("comparisonOperator", "equals");
+
+        JSONObject itemTypePropertyCondition = new JSONObject();
+        itemTypePropertyCondition.put("type", "eventPropertyCondition");
+        itemTypePropertyCondition.put("parameterValues", itemTypePropertyConditionParameters);
+
+        JSONObject nodePropertyConditionParameters = new JSONObject();
+        nodePropertyConditionParameters.put("propertyName", "target.properties.pageInfo.nodeType");
+        nodePropertyConditionParameters.put("propertyValue", "jnt:page");
+        nodePropertyConditionParameters.put("comparisonOperator", "equals");
+
+        JSONObject nodePropertyCondition = new JSONObject();
+        nodePropertyCondition.put("type", "eventPropertyCondition");
+        nodePropertyCondition.put("parameterValues", nodePropertyConditionParameters);
+
+        JSONObject booleanConditionParameterValues = new JSONObject();
+        booleanConditionParameterValues.put("operator", "and");
+        booleanConditionParameterValues.put("subConditions", new JSONArray(Arrays.asList(nodeTypePropertyCondition, itemTypePropertyCondition, nodePropertyCondition)));
+
+        JSONObject booleanCondition = new JSONObject();
+        booleanCondition.put("type", "booleanCondition");
+        booleanCondition.put("parameterValues", booleanConditionParameterValues);
+
+        JSONObject aggregateQuery = new JSONObject();
+        aggregateQuery.put("condition", booleanCondition);
+
+        Map<String, Integer> result = contextServerService.executePostRequest(siteKey, url, aggregateQuery.toString(), null, getHeaders(renderContext.getRequest()), new HashMap<>().getClass());
+
+        result.remove("_filtered");
+        result.remove("_missing");
+        result.remove("_all");
+
+        String currentPageId = renderContext.getMainResource().getNode().getIdentifier();
+
+        Set<CustomObject> finalResult = new HashSet();
+        for (Map.Entry<String, Integer> r : result.entrySet()) {
+            JCRNodeWrapper node = renderContext.getSite().getSession().getNodeByUUID(r.getKey());
+            long nt = 0;
+            long nc = 0;
+            long nv = r.getValue();
+
+            if (node.hasProperty("j:tagList")) {
+                nt = node.getProperty("j:tagList").getValues().length;
+            }
+
+            if (node.hasProperty("j:defaultCategory")) {
+                nc = node.getProperty("j:defaultCategory").getValues().length;
+            }
+
+            long t = 4 * nv + 2 * nt + nc;
+
+            CustomObject o = new CustomObject(
+                    r.getKey(),
+                    nv,
+                    nt,
+                    nc,
+                    t
+            );
+
+            if (!currentPageId.equals(r.getKey())) {
+                finalResult.add(o);
+            }
+        }
+
+        return finalResult;
+    }
+
+   public static class CustomObject {
+        private String id;
+        private Long nView;
+        private long nTags;
+        private long nCategories;
+        private long nTotal;
+
+        public CustomObject(String id, Long nView, long nTags, long nCategories, long nTotal) {
+            this.id = id;
+            this.nView = nView;
+            this.nTags = nTags;
+            this.nCategories = nCategories;
+            this.nTotal = nTotal;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public Long getnView() {
+            return nView;
+        }
+
+        public long getnTags() {
+            return nTags;
+        }
+
+        public long getnCategories() {
+            return nCategories;
+        }
+
+        public long getnTotal() {
+            return nTotal;
+        }
+    }
+
     private static Set<String> getViewedContents(HttpServletRequest httpServletRequest, String siteKey, long numberOfPastDays, String nodeType) throws JSONException, IOException {
         String url = "/cxs/query/event/target.itemId?optimizedQuery=true";
         String profileId = contextServerService.getProfileId(httpServletRequest, siteKey);

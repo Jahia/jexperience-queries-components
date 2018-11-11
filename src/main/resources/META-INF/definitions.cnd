@@ -13,3 +13,6 @@
  - maxNews (long) = 10 indexed=no
  - newsDateLastDays (long) = 30 indexed=no
  - hideViewedNews (boolean) = false autocreated
+
+[pqcnt:mlRec] > jnt:content, pqcmix:personalizedQueriesComponents, mix:title, jmix:list
+ - jcr:title (string) mandatory internationalized
