@@ -88,6 +88,19 @@
         </dependency>
 
         <dependency>
+            <groupId>atg.taglib.json</groupId>
+            <artifactId>json-taglib</artifactId>
+            <version>0.4.1</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-el</artifactId>
+                    <groupId>commons-el</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.eclipse.gemini.blueprint</groupId>
             <artifactId>gemini-blueprint-core</artifactId>
             <version>1.0.2.RELEASE</version>
