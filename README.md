@@ -51,6 +51,9 @@ To ease start with machine learning, we have defined a simple scenario to recomm
 
 So the main idea is to educate/train our Model to solve this formula with some data after that we pass the real data we get from Apache Unomi to recommend to the end user the articles.
 
+The following schema show the architecture of the recommendation system: 
+![Schema](https://user-images.githubusercontent.com/8075371/48349800-95056e00-e685-11e8-9fd4-17693fcded10.png)
+
 ## Found a bug?
 
 Please feel free to [create an issue](https://support.jahia.com/) if you find anything wrong with this component.
