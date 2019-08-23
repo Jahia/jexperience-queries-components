@@ -14,7 +14,7 @@
     <function>
         <description>Retrieve last contents</description>
         <name>retrieveLastContents</name>
-        <function-class>org.jahia.modules.personalizedqueriescomponents.tag.PqcFunctions</function-class>
+        <function-class>org.jahia.modules.jexperiencequeriescomponents.tag.PqcFunctions</function-class>
         <function-signature>java.util.Map retrieveLastContents(org.jahia.services.render.RenderContext,java.lang.String,long,java.lang.String,java.lang.String,boolean)</function-signature>
     </function>
 </taglib>

@@ -1,6 +1,6 @@
-# Personalized queries components
+# jExperience queries components
 
-This project contains personalized queries components.
+This project contains jExperience queries components.
 
 ## Minimal requirements
 

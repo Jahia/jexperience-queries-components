@@ -52,11 +52,11 @@
         <version>7.2.2.0</version>
     </parent>
 
-    <artifactId>personalized-queries-components</artifactId>
+    <artifactId>jexperience-queries-components</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>Personalized queries components</name>
-    <description>This is the custom module (Personalized queries components) for running on a Digital Experience Manager server.</description>
+    <name>jExperience queries components</name>
+    <description>This is the custom module (jExperience queries components) for running on a Digital Experience Manager server.</description>
 
     <scm>
         <connection>scm:git:git@github.com:Jahia/personalized-queries-components.git</connection>

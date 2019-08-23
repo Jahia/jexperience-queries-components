@@ -41,7 +41,7 @@
  *     If you are unsure which license is appropriate for your use,
  *     please contact the sales department at sales@jahia.com.
  */
-package org.jahia.modules.personalizedqueriescomponents.tag;
+package org.jahia.modules.jexperiencequeriescomponents.tag;
 
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.jexperience.admin.ContextServerService;

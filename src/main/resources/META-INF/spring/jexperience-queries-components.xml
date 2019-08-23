@@ -7,7 +7,7 @@
 
     <osgi:reference id="contextServerService" interface="org.jahia.modules.jexperience.admin.ContextServerService" availability="mandatory"/>
 
-    <bean id="getPublicationDataForNode" class="org.jahia.modules.personalizedqueriescomponents.tag.PqcFunctions">
+    <bean id="getPublicationDataForNode" class="org.jahia.modules.jexperiencequeriescomponents.tag.PqcFunctions">
         <property name="contextServerService" ref="contextServerService"/>
         <property name="ipForwardingHeaderName" value="${wemIpForwardingHeaderName:X-Forwarded-For}"/>
     </bean>
