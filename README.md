@@ -5,7 +5,7 @@ This project contains personalized queries components.
 ## Minimal requirements
 
 * DX 7.2.2.0
-* Marketing Factory 1.9.3
+* jExperience 2.0.0-SNAPSHOT
 
 ## Build and deploy
 

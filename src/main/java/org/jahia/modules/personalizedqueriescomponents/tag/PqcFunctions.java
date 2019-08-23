@@ -44,8 +44,8 @@
 package org.jahia.modules.personalizedqueriescomponents.tag;
 
 import org.apache.commons.lang.StringUtils;
-import org.jahia.modules.marketingfactory.admin.ContextServerService;
-import org.jahia.modules.marketingfactory.tag.WemFunctions;
+import org.jahia.modules.jexperience.admin.ContextServerService;
+import org.jahia.modules.jexperience.tag.WemFunctions;
 import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.*;
 import org.jahia.services.render.RenderContext;
