@@ -59,9 +59,9 @@
     <description>This is the custom module (jExperience queries components) for running on a Digital Experience Manager server.</description>
 
     <scm>
-        <connection>scm:git:git@github.com:Jahia/personalized-queries-components.git</connection>
-        <developerConnection>scm:git:git@github.com:Jahia/personalized-queries-components.git</developerConnection>
-        <url>https://github.com/Jahia/personalized-queries-components</url>
+        <connection>scm:git:git@github.com:Jahia/jexperience-queries-components.git</connection>
+        <developerConnection>scm:git:git@github.com:Jahia/jexperience-queries-components.git</developerConnection>
+        <url>https://github.com/Jahia/jexperience-queries-components</url>
         <tag>HEAD</tag>
     </scm>
 
