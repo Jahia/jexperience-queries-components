@@ -5,7 +5,7 @@ This project contains jExperience queries components.
 ## Minimal requirements
 
 * DX 7.2.2.0
-* jExperience 2.0.0-SNAPSHOT
+* jExperience 1.11.0-SNAPSHOT
 
 ## Build and deploy
 
