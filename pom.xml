@@ -77,7 +77,7 @@
     </distributionManagement>
 
     <properties>
-        <jahia-module-signature>MCwCFCx8QBfv4vKbQVoIKXxE7tQ5bqc8AhQkf1mqXb4giuDqZl8J+EABygtkNw==</jahia-module-signature>
+        <jahia-module-signature>MCwCFBgcvb0STZ/L3iOOi4svw9wtnd89AhRpAYCFUp5lq/BM7a62hzi0U9Sdpg==</jahia-module-signature>
         <!--jahia-depends>bootstrap3-core,default,jexperience,search-provider-elasticsearch</jahia-depends-->
         <jahia-depends>bootstrap3-core,default,jexperience</jahia-depends>
     </properties>
