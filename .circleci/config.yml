@@ -1,0 +1,404 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@0.5.20
+
+# Parameters are available across the entire config file and can be used with this syntax: << pipeline.parameters.THE_PARAMETER >>
+# Avoid using project-specific variables in the jobs or steps.
+# Instead, declare those as pipeline parameters (At the top of the config file).
+# This eases portability of the config file across different modules
+parameters:
+  GITHUB_SLUG:
+    type: string
+    default: "jahia/jexperience-queries-components"
+  MODULE_ID:
+    type: string
+    default: "jexperience-queries-components"
+  PRIMARY_RELEASE_BRANCH:
+    type: string
+    default: "master"
+  RELEASE_ID:
+    type: string
+    default: ""
+  RELEASE_VERSION:
+    type: string
+    default: ""
+  IS_RELEASE:
+    type: boolean
+    default: false
+
+references:
+  workdir: &workdir
+    working_directory: ~/source
+
+  persist-workspace: &persist-workspace
+    persist_to_workspace:
+      root: ~/source
+      paths:
+        - .
+
+  attach-workspace: &attach-workspace
+    attach_workspace:
+      at: .
+
+jobs:
+  # This job is there to prepare the repo for the next steps
+  initialize:
+    <<: *workdir
+    docker:
+      - image: cimg/node:14.15
+    steps:
+      - checkout
+      - *persist-workspace
+
+  checkout:
+    <<: *workdir
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - checkout
+      - *persist-workspace
+
+  # Build the module and save it locally
+  # We're saving the artifacts that are then used later on to execute the tests
+  # The artifacts are also stored and made available through circleci UI if further investigations are necessary
+  build:
+    <<: *workdir
+    docker:
+      - image: cimg/openjdk:8.0.275
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn -s .circleci/.circleci.settings.xml clean install
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+      # Environment provisioning is sometimes dependent upon dependencies build during mvn clean install
+      # This step copies those dependencies and make them available for further actions,
+      # such as being used to provision a running Jahia with a set of freshly built artifacts
+      - run: mvn -s .circleci/.circleci.settings.xml dependency:copy-dependencies
+      - run:
+          name: Prepare artifacts
+          command: |
+            mkdir /tmp/artifacts/
+            cp /home/circleci/source/target/*.jar /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+      - *persist-workspace
+
+  # This job publish the artifact to nexus by calling the deploy command
+  # It is only executed when merging into master (after successful PR execution)
+  publish:
+    <<: *workdir
+    docker:
+      - image: cimg/openjdk:8.0.275
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
+
+  sonar:
+    <<: *workdir
+    docker: # run the steps with Docker
+      - image: circleci/openjdk:11-jdk-stretch
+    resource_class: medium
+    steps:
+      - *attach-workspace
+      - checkout
+      - restore_cache:
+          keys:
+            - sonar-dependencies-{{ checksum "pom.xml" }}
+            # Fallback if no exact match found
+            - sonar-dependencies-
+      # We're executing different actions depending fi the job was triggered by a PR or if it was triggered on branch
+      # If the branch was not triggered by a PR, the CIRCLE_PULL_REQUEST variable will be empty
+      - run:
+          name: Sonar Release branch analysis
+          environment:
+            DEPENDENCY_CHECK_SETTINGS: -DfailOnError=false -DskipProvidedScope=true -DskipTestScope=false -Dformats=HTML,JSON
+              -Dsonar.dependencyCheck.jsonReportPath=target/dependency-check-report.json
+              -Dsonar.dependencyCheck.htmlReportPath=target/dependency-check-report.html
+              -DretireJsAnalyzerEnabled=false -DnodeAnalyzerEnabled=false
+          command: |
+            if [[ ! -z "$CIRCLE_PULL_REQUEST" ]]; then
+              # echo "Git custom command to fix circle-ci checkout for sonar analysis"
+              git fetch --all
+              git branch -D << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
+              git rev-parse origin/<< pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
+              echo "Executing a PR based analysis"
+              mvn -s .circleci/.circleci.settings.xml sonar:sonar \
+                  -Dsonar.projectKey=<< pipeline.parameters.MODULE_ID >> \
+                  -Dsonar.pullrequest.branch=$CIRCLE_BRANCH \
+                  -Dsonar.pullrequest.key=${CIRCLE_PULL_REQUEST##*/} \
+                  -Dsonar.pullrequest.base=<< pipeline.parameters.PRIMARY_RELEASE_BRANCH >> \
+                  -Dsonar.pullrequest.github.repository=<< pipeline.parameters.GITHUB_SLUG >>
+            elif [[ "$CIRCLE_BRANCH" == << pipeline.parameters.PRIMARY_RELEASE_BRANCH >> ]]; then
+              echo "Executing an analysis on the main branch"
+              mvn -s .circleci/.circleci.settings.xml dependency-check:aggregate sonar:sonar \
+                  -Dsonar.projectKey=<< pipeline.parameters.MODULE_ID >> $DEPENDENCY_CHECK_SETTINGS
+            else
+              echo "Executing an analysis on branch: $CIRCLE_BRANCH"
+              mvn -s .circleci/.circleci.settings.xml dependency-check:aggregate sonar:sonar \
+                  -Dsonar.branch.name=$CIRCLE_BRANCH $DEPENDENCY_CHECK_SETTINGS
+            fi
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: sonar-dependencies-{{ checksum "pom.xml" }}
+
+  generate-changelog:
+    <<: *workdir
+    docker: # run the steps with Docker
+      - image: cimg/node:14.15
+    resource_class: xlarge
+    steps:
+      - checkout
+      - *attach-workspace
+      - add_ssh_keys:
+          fingerprints:
+            - "b9:ff:f3:58:b0:d7:e2:fa:9e:ca:e8:04:c9:d8:4f:f4"
+      - run:
+          name: Setting up github configuration
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            git config user.email "jahia-ci@jahia.com"
+            git config user.name "Jahia CI"
+      - run:
+          name: Getting latest changes from the remote branch
+          command: |
+            git fetch --all
+            git pull origin $CIRCLE_BRANCH --quiet
+      - run:
+          name: Update Changelog
+          command: |
+            yarn
+            yarn add auto
+            GH_TOKEN=${GITHUB_API_TOKEN} yarn auto changelog
+            git push --set-upstream origin $CIRCLE_BRANCH
+      - *persist-workspace
+
+  release:
+    <<: *workdir
+    docker: # run the steps with Docker
+      - image: cimg/openjdk:8.0.275-node
+    resource_class: xlarge
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "9b:1c:a7:f2:28:a3:fa:c7:c6:0b:a5:d3:e8:58:6c:15"
+      - run:
+          name: Getting latest changes from the remote branch
+          command: |
+            git fetch --all
+            git pull origin $CIRCLE_BRANCH --quiet
+      - run:
+          name: Delete github tag <<pipeline.parameters.RELEASE_VERSION>>
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            git config user.email "jahia-ci@jahia.com"
+            git config user.name "Jahia CI"
+            git tag --delete <<pipeline.parameters.RELEASE_VERSION>>
+            git push --delete origin <<pipeline.parameters.RELEASE_VERSION>>
+      - run:
+          name: Release prepare version for <<pipeline.parameters.RELEASE_VERSION>>
+          command: |
+            FINAL_RELEASE_VERSION=$(echo <<pipeline.parameters.RELEASE_VERSION>> | cut -d'-' -f 1)
+            MAJOR_VERSION=`echo $FINAL_RELEASE_VERSION | cut -d. -f1`
+            MINOR_VERSION=`echo $FINAL_RELEASE_VERSION | cut -d. -f2`
+            REVISION=`echo $FINAL_RELEASE_VERSION | cut -d. -f3`
+
+            if [[ "<<pipeline.parameters.PRIMARY_RELEASE_BRANCH>>" == "master"  || "<<pipeline.parameters.PRIMARY_RELEASE_BRANCH>>" == "main"  ||  "<<pipeline.parameters.PRIMARY_RELEASE_BRANCH>>" =~ ^[0-9]_x$ ]]; then
+             NEXT_MINOR_VERSION=`expr $MINOR_VERSION + 1`
+             NEXT_DEVELOPMENT_VERSION="$MAJOR_VERSION.$NEXT_MINOR_VERSION.0"-SNAPSHOT
+            else
+              NEXT_REVISION=`expr $REVISION + 1`
+              NEXT_DEVELOPMENT_VERSION="$MAJOR_VERSION.$MINOR_VERSION.$NEXT_REVISION"-SNAPSHOT
+            fi
+
+            mvn -s .circleci/.circleci.settings.xml -B -Dtag=$FINAL_RELEASE_VERSION release:prepare -DreleaseVersion=$FINAL_RELEASE_VERSION -DdevelopmentVersion="$NEXT_DEVELOPMENT_VERSION"
+      - run:
+          name: Update github release for id << pipeline.parameters.RELEASE_ID >>
+          command: |
+            curl -X PATCH \
+            -H "Accept:application/vnd.github.v3+json" \
+            -d "{\"tag_name\":\"<<pipeline.parameters.RELEASE_VERSION>>\", \"prerelease\": false, \"draft\": false}" -u \
+            jahia-ci:$GITHUB_API_TOKEN https://api.github.com/repos/<<pipeline.parameters.GITHUB_SLUG>>/releases/<< pipeline.parameters.RELEASE_ID >>
+      - run:
+          name: Perform release
+          command: |
+            mvn -s .circleci/.circleci.settings.xml release:perform -Prelease-to-staging-repository -DscmCommentPrefix="[skip ci] [maven-release-plugin]"
+      - run:
+          name: Copy artifacts
+          command: |
+            mkdir /tmp/artifacts/
+            cp /home/circleci/source/target/*.jar /tmp/artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts/
+
+  update-signature:
+    <<: *workdir
+    docker:
+      - image: cimg/openjdk:8.0.275-node
+    parameters:
+      KEYMAKER_VERSION:
+        type: string
+        default: "2.0"
+      KEYMAKER_LOCATION:
+        type: string
+        default: "org/jahia/keymaker/keymaker-cli"
+      KEYMAKER_NAME:
+        type: string
+        default: "keymaker-cli"
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "9b:1c:a7:f2:28:a3:fa:c7:c6:0b:a5:d3:e8:58:6c:15"
+      - run:
+          name: Setting up github configuration
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            git config user.email "jahia-ci@jahia.com"
+            git config user.name "Jahia CI"
+      - run:
+          name: Getting latest changes from the remote branch
+          command: |
+            echo "Handling if this job was re-ran"
+            git fetch --all
+            git pull origin $CIRCLE_BRANCH --quiet
+      - run:
+          name: Downloading keymaker artifacts
+          command: |
+            mkdir -p target/keymaker
+            url="${NEXUS_ENTERPRISE_RELEASES_URL}/content/<<parameters.KEYMAKER_LOCATION>>/<<parameters.KEYMAKER_VERSION>>/<<parameters.KEYMAKER_NAME>>-<<parameters.KEYMAKER_VERSION>>-jar-with-dependencies.jar"
+            curl --header "Authorization: Basic $(echo -n "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" | base64)" \
+                --url "${url}" \
+                --output "target/keymaker/<<parameters.KEYMAKER_NAME>>.jar"
+            KEYMAKER_CLI_JAR="$(pwd)/target/keymaker/<<parameters.KEYMAKER_NAME>>.jar"
+            echo "export KEYMAKER_CLI_JAR=${KEYMAKER_CLI_JAR}" >> $BASH_ENV
+            . $BASH_ENV
+      - run:
+          name: Handling signature update for single or multiple submodules
+          command: |
+            root_dir=$(pwd)
+            packaging_type=$(mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout | xargs)
+            if [[ ${packaging_type} == "pom" ]]; then
+              project_modules=($(mvn -q --also-make exec:exec -Dexec.executable="pwd"))
+              for module in ${project_modules[@]:1}; do
+                if [[ ${module} != ${root_dir} ]]; then
+                  cd $module
+                  group_id=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout | xargs)
+                  parent_group_id=$(mvn help:evaluate -Dexpression=project.parent.groupId -q -DforceStdout | xargs)
+                  project_name=$(mvn help:evaluate -Dexpression=project.name -q -DforceStdout | xargs)
+                  packaging_type=$(mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout | xargs | xargs)
+                  if [[ ${packaging_type} == "bundle" ]]; then
+                    KEYMAKER_CLI_OUTPUT=`java -jar ${KEYMAKER_CLI_JAR} pom -f pom.xml -s`
+                    if [[ ${group_id} == "org.jahia.modules" || ${parent_group_id} == "org.jahia.modules" ]]; then
+                      if [[ $(echo $KEYMAKER_CLI_OUTPUT | grep -w "Signature valid" | wc -l) != "1" ]]; then
+                        sed -i -e "s%<\(.*\)Jahia-Signature>.*</%<\1Jahia-Signature>${KEYMAKER_CLI_OUTPUT}</%" pom.xml
+                        sed -i -e "s%<\(.*\)jahia-module-signature>.*</%<\1jahia-module-signature>${KEYMAKER_CLI_OUTPUT}</%" pom.xml
+                        git add pom.xml && git commit -m "[ci skip] Update signature for ${project_name}"
+                        git push -u origin ${CIRCLE_BRANCH}
+                      else
+                        echo "Signature is up-to-date."
+                      fi
+                    else
+                      echo "This project is not a Jahia module."
+                    fi
+                  else
+                    echo "Ignoring project ${project_name} b/c it's a ${packaging_type} packaging type"
+                  fi
+                  cd -
+                fi
+              done
+            else
+              echo "There are no submodules in this project"
+            fi
+      - run:
+          name: Handling signature for a single module
+          command: |
+            packaging_type=$(mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout | xargs)
+            echo "Packing type: ${packaging_type}"
+            if [[ ${packaging_type} == "bundle" ]]; then
+              group_id=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout | xargs)
+              parent_group_id=$(mvn help:evaluate -Dexpression=project.parent.groupId -q -DforceStdout | xargs)
+              project_name=$(mvn help:evaluate -Dexpression=project.name -q -DforceStdout | xargs)
+              if [[ ${group_id} != "org.jahia.modules" && ${parent_group_id} != "org.jahia.modules" ]]; then
+                echo "Project is not a Jahia modules"
+                circleci-agent step halt
+              else
+                KEYMAKER_CLI_OUTPUT=`java -jar ${KEYMAKER_CLI_JAR} pom -f pom.xml -s`
+                if [[ $(echo $KEYMAKER_CLI_OUTPUT | grep -w "Signature valid" | wc -l) == "1" ]]; then
+                  echo "Signature is already up-to-date"
+                  circleci-agent step halt
+                else
+                  echo "New signature: ${KEYMAKER_CLI_OUTPUT}"
+                  sed -i -e "s%<\(.*\)Jahia-Signature>.*</%<\1Jahia-Signature>${KEYMAKER_CLI_OUTPUT}</%" pom.xml
+                  sed -i -e "s%<\(.*\)jahia-module-signature>.*</%<\1jahia-module-signature>${KEYMAKER_CLI_OUTPUT}</%" pom.xml
+                  git add pom.xml && git commit -m "[ci skip] Updated signature for ${project_name}"
+                  git push -u origin ${CIRCLE_BRANCH}
+                fi
+              fi
+            else
+              echo "There are submodule(s) in this projects"
+            fi
+
+workflows:
+  version: 2
+  # On code change is executed each time new code is pushed to a branch
+  # Current project configuration in circleci only builds on PR + main, so effectively this is only being executed
+  on-code-change:
+    unless: << pipeline.parameters.IS_RELEASE >>
+    jobs:
+      - initialize
+      - build:
+          context: QA_ENVIRONMENT
+          requires:
+            - initialize
+      - sonar:
+          context: QA_ENVIRONMENT
+          requires:
+            - build
+      - publish:
+          context: QA_ENVIRONMENT
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
+
+  # The on-release workflow was created to handle the full release lifecycle after creating a release using GitHub
+  # https://github.com/Jahia/sandbox/releases
+  # The release is first created using the "pre-release" tag and a pipeline is triggered from a GitHub action
+  # This pipeline perform the following action:
+  # - Delete the tag created by GitHub (unnecessary)
+  # - Run mvn release:prepare
+  # - Run mvn release:perform
+  on-release:
+    when: << pipeline.parameters.IS_RELEASE >>
+    jobs:
+      - initialize
+      - generate-changelog:
+          context: QA_ENVIRONMENT
+          requires:
+            - initialize
+      - release:
+          context: QA_ENVIRONMENT
+          requires:
+            - generate-changelog
+      - update-signature:
+          context: QA_ENVIRONMENT
+          requires:
+            - release
