@@ -16,7 +16,7 @@ parameters:
     default: "jexperience-queries-components"
   PRIMARY_RELEASE_BRANCH:
     type: string
-    default: "master"
+    default: "1_11_x"
   RELEASE_ID:
     type: string
     default: ""
