@@ -254,7 +254,7 @@ public class PqcFunctions {
 
                     nodeId = id.get(hit.getRawHit()).toString();
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    logger.error("Error while handling hit id",e);
                 }
             }
 
