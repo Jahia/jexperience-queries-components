@@ -48,6 +48,7 @@ jobs:
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
           module_id: jexperience-queries-components
           mvn_settings_filepath: '.github/maven.settings.xml'
+
   sonar-analysis:
     name: Sonar Analysis
     needs: build
